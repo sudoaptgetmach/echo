@@ -1,0 +1,14 @@
+services:
+  rabbitmq:
+    image: 'rabbitmq:latest'
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+      - '15692:15692'
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '6379:6379'

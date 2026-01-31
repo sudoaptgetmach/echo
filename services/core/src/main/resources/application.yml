@@ -1,0 +1,29 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          vatsim:
+            client-id: ${VATSIM_CLIENT_ID}
+            client-secret: ${VATSIM_CLIENT_SECRET}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - full_name
+              - email
+              - vatsim_details
+            client-name: VATSIM Connect (DEV)
+            provider: vatsim
+        provider:
+          vatsim:
+            authorization-uri: https://auth-dev.vatsim.net/oauth/authorize
+            token-uri: https://auth-dev.vatsim.net/oauth/token
+            user-info-uri: https://auth-dev.vatsim.net/api/user
+            user-name-attribute: data
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET}
+      expiration: 86400000
