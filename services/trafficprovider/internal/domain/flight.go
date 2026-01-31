@@ -1,11 +1,8 @@
 package domain
 
-import (
-	"github.com/google/uuid"
-)
-
 type SourceType string
 type State string
+type AircraftType string
 
 const (
 	VatsimLive SourceType = "VATSIM_LIVE"
@@ -22,10 +19,18 @@ const (
 	Takeoff    State = "TAKEOFF"
 )
 
+const (
+	LIGHT  string = "LIGHT"
+	MEDIUM string = "MEDIUM"
+	HEAVY  string = "HEAVY"
+	SUPER  string = "SUPER"
+)
+
 type Aircraft struct {
-	Callsign    string `json:"callsign,omitempty"`
-	Type        string `json:"type,omitempty"`
-	Transponder string `json:"transponder,omitempty"`
+	Callsign       string `json:"callsign,omitempty"`
+	Type           string `json:"type,omitempty"`
+	WakeTurbulence string
+	Transponder    string `json:"transponder,omitempty"`
 }
 
 type FlightPlan struct {
@@ -41,7 +46,7 @@ type EnvironmentMock struct {
 }
 
 type Flight struct {
-	ScenarioId      uuid.UUID       `json:"scenario_id,omitempty"`
+	ScenarioId      string          `json:"scenario_id,omitempty"`
 	Source          SourceType      `json:"source,omitempty"`
 	Aircraft        Aircraft        `json:"aircraft,omitempty"`
 	FlightPlan      FlightPlan      `json:"flight_plan,omitempty"`

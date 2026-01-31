@@ -1,16 +1,15 @@
 package main
 
 import (
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"sudoaptgetmach.me/trafficprovider/internal/domain"
+	"sudoaptgetmach.me/trafficprovider/internal/adapter/vatsim"
 )
 
 func main() {
@@ -51,41 +50,41 @@ func main() {
 		failOnError(err, "Failed to declare an exchange")
 	}
 
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(15 * time.Second)
 
 	for range ticker.C {
-		mockFlight := &domain.Flight{
-			ScenarioId:      uuid.New(),
-			Source:          domain.VatsimLive,
-			Aircraft:        domain.Aircraft{},
-			FlightPlan:      domain.FlightPlan{},
-			EnvironmentMock: domain.EnvironmentMock{},
-			ExpectedState:   domain.Clearance,
-		}
+		flights := vatsim.FetchData()
 
-		mockFlightJson, jsonErr := json.Marshal(mockFlight)
-
-		if jsonErr != nil {
-			log.Printf("Erro ao criar JSON: %v", err)
+		if flights == nil {
+			log.Println("ERR: Nenhum dado recebido (ou erro na API).")
 			continue
 		}
 
-		err = ch.Publish(
-			"flight_events",
-			"flight.vatsim.update",
-			false,
-			false,
-			amqp.Publishing{
-				ContentType: "application/json",
-				Body:        mockFlightJson,
-			},
-		)
+		log.Printf("INFO: Processando %d voos...", len(flights))
 
-		if err != nil {
-			log.Printf("Erro ao publicar: %s", err)
-		} else {
-			log.Printf(" [x] Sent flight update")
+		for _, flight := range flights {
+			body, err := json.Marshal(flight)
+			if err != nil {
+				log.Printf("Erro ao serializar voo %s: %v", flight.Aircraft.Callsign, err)
+				continue
+			}
+
+			err = ch.Publish(
+				"flight_events",
+				"flight.vatsim.update",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "application/json",
+					Body:        body,
+				},
+			)
+
+			if err != nil {
+				log.Printf("Erro ao publicar %s: %v", flight.Aircraft.Callsign, err)
+			}
 		}
+		log.Printf("INFO: Ciclo finalizado.")
 	}
 }
 
