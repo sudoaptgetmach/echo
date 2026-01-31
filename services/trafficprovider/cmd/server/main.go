@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sudoaptgetmach.me/trafficprovider/internal/adapter/vatsim"
+	"sudoaptgetmach.me/trafficprovider/internal/service"
 )
 
 func main() {
@@ -18,6 +19,8 @@ func main() {
 		fmt.Println("Erro ao carregar o arquivo .env")
 		return
 	}
+
+	service.InitCache()
 
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:5672/", os.Getenv("RABBITMQ_USER"), os.Getenv("RABBITMQ_PASS"), os.Getenv("RABBITMQ_HOST")))
 	failOnError(err, "Failed to connect to RabbitMQ")

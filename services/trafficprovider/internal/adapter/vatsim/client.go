@@ -2,6 +2,8 @@ package vatsim
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -9,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"sudoaptgetmach.me/trafficprovider/internal/domain"
+	"sudoaptgetmach.me/trafficprovider/internal/service"
 )
 
 type Data struct {
@@ -129,7 +132,14 @@ func FetchData() []domain.Flight {
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
+		fmt.Println(err)
 	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(resp.Body)
 
 	flights := make([]domain.Flight, 0)
 
@@ -149,6 +159,8 @@ func FetchData() []domain.Flight {
 			}
 		}
 
+		var EnvData = service.GetEnvironmentData(p.FlightPlanDTO.Departure)
+
 		newFlight := domain.Flight{
 			ScenarioId: uuid.New().String(),
 			Source:     domain.VatsimLive,
@@ -163,9 +175,9 @@ func FetchData() []domain.Flight {
 			FlightPlan: dFlightPlan,
 
 			EnvironmentMock: domain.EnvironmentMock{
-				ActiveRunway: "10L",
-				AssignedSid:  "ESORU1A",
-				Qnh:          "1013",
+				ActiveRunway: EnvData.ActiveRunway,
+				AssignedSid:  EnvData.AssignedSid,
+				Qnh:          EnvData.Qnh,
 			},
 
 			ExpectedState: domain.Clearance,

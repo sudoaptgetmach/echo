@@ -1,5 +1,15 @@
 package airportinfo
 
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"time"
+)
+
 type AirportData struct {
 	Ident            string    `json:"ident"`
 	Type             string    `json:"type"`
@@ -62,10 +72,66 @@ type AirportDataDTO struct {
 }
 
 type RunwaysDto struct {
-	Id           string `json:"id"`
-	AirportRef   string `json:"airport_ref"`
-	AirportIdent string `json:"airport_ident"`
-	Closed       string `json:"closed"`
-	LeIdent      string `json:"le_ident"`
-	HeIdent      string `json:"he_ident"`
+	Id            string `json:"id"`
+	AirportRef    string `json:"airport_ref"`
+	AirportIdent  string `json:"airport_ident"`
+	Closed        string `json:"closed"`
+	LeIdent       string `json:"le_ident"`
+	LeHeadingDegT string `json:"le_heading_degT"`
+	HeIdent       string `json:"he_ident"`
+	HeHeadingDegT string `json:"he_heading_degT"`
+}
+
+type Response struct {
+	Runways []RunwaysDto `json:"runways,omitempty"`
+}
+
+func FetchAirportRunways(icao string) []RunwaysDto {
+	resp, err := http.Get(fmt.Sprintf("https://airportdb.io/api/v1/airport/%s?apiToken=%s", icao, os.Getenv("AIRPORTDB_API_KEY")))
+	if err != nil {
+		log.Println("Erro request:", err)
+		return nil
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(resp.Body)
+
+	var data Response
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Println("Erro:", err)
+		return nil
+	}
+
+	return data.Runways
+}
+
+func GetAirportWind(icao string) (float64, error) {
+	client := http.Client{Timeout: 5 * time.Second}
+
+	resp, err := client.Get(fmt.Sprintf("https://aviationweather.gov/api/data/metar?ids=%s&format=json&taf=false", icao))
+	if err != nil {
+		return 0, err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(resp.Body)
+
+	var data []MetarData
+	err = json.NewDecoder(resp.Body).Decode(&data)
+
+	if err != nil {
+		return 0, err
+	}
+
+	if len(data) == 0 {
+		return 0, fmt.Errorf("nenhum metar encontrado para %s", icao)
+	}
+
+	return data[0].Wdir, nil
 }
