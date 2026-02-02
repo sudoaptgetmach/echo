@@ -118,7 +118,6 @@ func isRelevantFlight(fp *FlightPlanDTO) bool {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -144,7 +143,6 @@ func FetchData() []domain.Flight {
 	flights := make([]domain.Flight, 0)
 
 	for _, p := range data.Pilots {
-
 		if !isRelevantFlight(p.FlightPlanDTO) {
 			continue
 		}
@@ -158,33 +156,22 @@ func FetchData() []domain.Flight {
 				RouteString: p.FlightPlanDTO.Route,
 			}
 		}
-
 		var EnvData = service.GetEnvironmentData(p.FlightPlanDTO.Departure)
 
 		newFlight := domain.Flight{
 			ScenarioId: uuid.New().String(),
 			Source:     domain.VatsimLive,
-
 			Aircraft: domain.Aircraft{
 				Callsign:       p.Callsign,
 				Type:           p.FlightPlanDTO.AircraftShort,
 				WakeTurbulence: parseWakeTurbulence(p.FlightPlanDTO.Aircraft),
 				Transponder:    p.FlightPlanDTO.AssignedTransponder,
 			},
-
-			FlightPlan: dFlightPlan,
-
-			EnvironmentMock: domain.EnvironmentMock{
-				ActiveRunway: EnvData.ActiveRunway,
-				AssignedSid:  EnvData.AssignedSid,
-				Qnh:          EnvData.Qnh,
-			},
-
-			ExpectedState: domain.Clearance,
+			FlightPlan:      dFlightPlan,
+			EnvironmentMock: EnvData,
+			ExpectedState:   domain.Clearance,
 		}
-
 		flights = append(flights, newFlight)
 	}
-
 	return flights
 }

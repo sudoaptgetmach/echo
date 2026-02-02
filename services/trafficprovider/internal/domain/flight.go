@@ -42,7 +42,10 @@ type FlightPlan struct {
 type EnvironmentMock struct {
 	ActiveRunway string `json:"active_runway,omitempty"`
 	AssignedSid  string `json:"assigned_sid,omitempty"`
-	Qnh          string `json:"qnh,omitempty"`
+	Wdir         int    `json:"wdir"`
+	Wspd         int    `json:"wspd"`
+	Qnh          int    `json:"qnh,omitempty"`
+	RawMetar     string `json:"rawMetar"`
 }
 
 type Flight struct {
