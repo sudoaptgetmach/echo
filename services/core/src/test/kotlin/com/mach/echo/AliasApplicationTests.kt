@@ -1,4 +1,4 @@
-package com.mach.alias
+package com.mach.echo
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
