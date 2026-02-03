@@ -17,7 +17,7 @@ func GetAirportMetar(icao string) []domain.MetarResponseDto {
 
 	resp, err := client.Get(fmt.Sprintf("https://aviationweather.gov/api/data/metar?ids=%s&format=json&taf=false", icao))
 	if err != nil {
-		fmt.Printf("Erro na requisição METAR para %s: %v\n", icao, err)
+		fmt.Printf("Error when requesting %s METAR: %v\n", icao, err)
 		return []domain.MetarResponseDto{}
 	}
 	defer func(Body io.ReadCloser) {
@@ -26,7 +26,7 @@ func GetAirportMetar(icao string) []domain.MetarResponseDto {
 
 	var data []domain.MetarData
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		fmt.Printf("Erro ao decodificar JSON do METAR para %s: %v\n", icao, err)
+		fmt.Printf("Error when trying to decode %s METAR's JSON: %v\n", icao, err)
 		return []domain.MetarResponseDto{}
 	}
 

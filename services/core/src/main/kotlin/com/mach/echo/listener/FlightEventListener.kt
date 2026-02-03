@@ -30,10 +30,10 @@ class FlightEventListener(
                 )
             )
 
-            logger.info("Voo processado: ${flightDto.aircraft.callsign} na pista ${flightDto.environment.activeRunway}")
+            logger.info("Flight processed: ${flightDto.aircraft.callsign} on runway ${flightDto.environment.activeRunway}")
             gameService.processFlightUpdate(flightDto)
         } catch (e: Exception) {
-            logger.error("Erro ao processar mensagem: ${e.message}")
+            logger.error("Error while processing message: ${e.message}")
 
             logRepository.save(
                 FlightLog(

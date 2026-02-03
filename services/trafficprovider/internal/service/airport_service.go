@@ -31,7 +31,7 @@ func GetEnvironmentData(icao string) domain.EnvironmentMock {
 		return item.Data
 	}
 
-	log.Printf("Atualizando cache para %s...", icao)
+	log.Printf("Updating cache for %s...", icao)
 
 	var airportRunways = airportinfo.FetchAirportRunways(icao)
 	airportMetar := GetAirportMetar(icao)

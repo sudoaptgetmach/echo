@@ -16,7 +16,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Erro ao carregar o arquivo .env")
+		fmt.Println("Error when trying to load .env")
 		return
 	}
 
@@ -59,16 +59,16 @@ func main() {
 		flights := vatsim.FetchData()
 
 		if flights == nil {
-			log.Println("ERR: Nenhum dado recebido (ou erro na API).")
+			log.Println("ERR: No data received (or API error).")
 			continue
 		}
 
-		log.Printf("INFO: Processando %d voos...", len(flights))
+		log.Printf("INFO: Processing %d flights...", len(flights))
 
 		for _, flight := range flights {
 			body, err := json.Marshal(flight)
 			if err != nil {
-				log.Printf("Erro ao serializar voo %s: %v", flight.Aircraft.Callsign, err)
+				log.Printf("Error while serializing flight %s: %v", flight.Aircraft.Callsign, err)
 				continue
 			}
 
@@ -84,10 +84,10 @@ func main() {
 			)
 
 			if err != nil {
-				log.Printf("Erro ao publicar %s: %v", flight.Aircraft.Callsign, err)
+				log.Printf("Error publishing %s: %v", flight.Aircraft.Callsign, err)
 			}
 		}
-		log.Printf("INFO: Ciclo finalizado.")
+		log.Printf("INFO: Cycle finished.")
 	}
 }
 

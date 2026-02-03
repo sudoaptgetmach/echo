@@ -26,7 +26,7 @@ class GameService(
             session.lastSeen = System.currentTimeMillis()
 
             sessionRepository.save(session)
-            logger.debug("Sessão atualizada: $callsign (Estado: ${session.gameState})")
+            logger.debug("Session updated: $callsign (State: ${session.gameState})")
 
         } else {
             val newSession = FlightSession(
@@ -39,7 +39,7 @@ class GameService(
             )
 
             sessionRepository.save(newSession)
-            logger.info("Nova sessão criada: $callsign na pista ${newSession.activeRunway}")
+            logger.info("New session created: $callsign on runway ${newSession.activeRunway}")
         }
     }
 }

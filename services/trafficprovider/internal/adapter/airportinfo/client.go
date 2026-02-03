@@ -14,7 +14,7 @@ import (
 func FetchAirportRunways(icao string) []domain.RunwaysDto {
 	resp, err := http.Get(fmt.Sprintf("https://airportdb.io/api/v1/airport/%s?apiToken=%s", icao, os.Getenv("AIRPORTDB_API_KEY")))
 	if err != nil {
-		log.Println("Erro request:", err)
+		log.Println("Error on FetchAirportRunways request:", err)
 		return nil
 	}
 	defer func(Body io.ReadCloser) {
@@ -26,7 +26,7 @@ func FetchAirportRunways(icao string) []domain.RunwaysDto {
 
 	var data domain.Response
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Println("Erro:", err)
+		log.Println("Error on AirportInfo Response:", err)
 		return nil
 	}
 
